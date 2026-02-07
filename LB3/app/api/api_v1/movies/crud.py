@@ -1,10 +1,27 @@
-movies_db = {
-    1: {"id": 1, "title": "Inception"},
-    2: {"id": 2, "title": "Interstellar"},
-}
+from LB3.modules.movie import Movie
 
-def get_movies():
-    return list(movies_db.values())
+MOVIES: list[Movie] = [
+    Movie(
+        slug="harry",
+        title="Harry Potter",
+        description="Some description",
+        year=2002,
+        duration=150,
+    ),
+    Movie(
+        slug="ring",
+        title="Lord's of the ring",
+        description="Some description",
+        year=2000,
+        duration=200,
+    ),
+]
 
-def get_movie(movie_id: int):
-    return movies_db.get(movie_id)
+
+def get_movies() -> list[Movie]:
+    return MOVIES
+
+
+def create_movie(movie: Movie) -> Movie:
+    MOVIES.append(movie)
+    return movie

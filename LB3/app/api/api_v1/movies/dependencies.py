@@ -1,11 +1,13 @@
 from fastapi import HTTPException, status
-from .crud import get_movie
+from LB3.modules.movie import Movie
+from .crud import MOVIES
 
-def movie_by_id(movie_id: int):
-    movie = get_movie(movie_id)
+
+def get_movie_by_slug(slug: str) -> Movie:
+    movie = next((m for m in MOVIES if m.slug == slug), None)
     if not movie:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Movie not found"
+            detail=f"Movie with slug {slug!r} not found",
         )
     return movie

@@ -1,10 +1,25 @@
-books_db = {
-    1: {"id": 1, "title": "1984"},
-    2: {"id": 2, "title": "Brave New World"},
-}
+from LB3.modules.book import Book
 
-def get_books():
-    return list(books_db.values())
+BOOKS: list[Book] = [
+    Book(
+        title="Harry Potter",
+        slug="harry",
+        description="Some description",
+        pages=400,
+    ),
+    Book(
+        title="Lord's of the ring",
+        slug="ring",
+        description="Some description",
+        pages=800,
+    ),
+]
 
-def get_book(book_id: int):
-    return books_db.get(book_id)
+
+def get_books() -> list[Book]:
+    return BOOKS
+
+
+def create_book(book: Book) -> Book:
+    BOOKS.append(book)
+    return book

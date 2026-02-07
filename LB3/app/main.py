@@ -1,6 +1,12 @@
 from fastapi import FastAPI
-from api.api_v1 import api_v1_router
+from LB3.app.api import router as api_router
 
-app = FastAPI()
 
-app.include_router(api_v1_router, prefix="/api/v1")
+app = FastAPI(title="Books & Movies API")
+
+app.include_router(api_router)
+
+
+@app.get("/")
+def read_root():
+    return {"docs": "/docs"}
