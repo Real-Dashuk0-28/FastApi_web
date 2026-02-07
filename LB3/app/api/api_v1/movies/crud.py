@@ -1,27 +1,26 @@
 from LB3.modules.movie import Movie
-
-MOVIES: list[Movie] = [
-    Movie(
-        slug="harry",
-        title="Harry Potter",
-        description="Some description",
-        year=2002,
-        duration=150,
-    ),
-    Movie(
-        slug="ring",
-        title="Lord's of the ring",
-        description="Some description",
-        year=2000,
-        duration=200,
-    ),
-]
+from fastapi import HTTPException, status
 
 
-def get_movies() -> list[Movie]:
-    return MOVIES
+class MovieStorage:
+    def __init__(self):
+        self._movies: list[Movie] = []
+
+    def get_all(self) -> list[Movie]:
+        return self._movies
+
+    def get_by_slug(self, slug: str) -> Movie:
+        for movie in self._movies:
+            if movie.slug == slug:
+                return movie
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Movie with slug '{slug}' not found",
+        )
+
+    def create(self, movie: Movie) -> Movie:
+        self._movies.append(movie)
+        return movie
 
 
-def create_movie(movie: Movie) -> Movie:
-    MOVIES.append(movie)
-    return movie
+movie_storage = MovieStorage()
