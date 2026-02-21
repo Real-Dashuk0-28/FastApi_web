@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from LB3.modules.movie import Movie
 from .crud import movie_storage
 

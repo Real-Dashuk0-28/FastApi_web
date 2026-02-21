@@ -22,5 +22,18 @@ class MovieStorage:
         self._movies.append(movie)
         return movie
 
+    def delete(self, movie: Movie) -> None:
+        self._movies.remove(movie)
+
+    def update(self, movie: Movie, movie_in) -> Movie:
+        for field, value in movie_in.model_dump().items():
+            setattr(movie, field, value)
+        return movie
+
+    def partial_update(self, movie: Movie, movie_in) -> Movie:
+        for field, value in movie_in.model_dump(exclude_unset=True).items():
+            setattr(movie, field, value)
+        return movie
+
 
 movie_storage = MovieStorage()
