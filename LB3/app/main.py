@@ -1,12 +1,13 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from LB3.app.api import router as api_router
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 app = FastAPI(title="Books & Movies API")
 
 app.include_router(api_router)
-
 
 @app.get("/")
 def read_root():
