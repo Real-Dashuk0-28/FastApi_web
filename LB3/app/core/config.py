@@ -1,7 +1,6 @@
-import secrets
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
 
-TOKENS = frozenset(
-    secrets.token_hex(16) for _ in range(5)
-)
-
-print(TOKENS)
+REDIS_TOKEN_DB = 1
+REDIS_USER_DB = 2
+REDIS_TOKEN_SET = "api_tokens"
