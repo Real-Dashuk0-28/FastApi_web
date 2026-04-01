@@ -2,42 +2,53 @@ from pydantic import BaseModel
 
 from ....schemas.book import Book, BookCreate, BookUpdate, BookPartialUpdate
 
+import redis
+import json
+from pydantic import BaseModel
+from ....core import config
+from ....schemas.book import Book, BookCreate, BookUpdate, BookPartialUpdate
+
+# Создаем Redis клиент для работы с книгами
+redis_books_client = redis.Redis(
+    host=config.REDIS_HOST,
+    port=config.REDIS_PORT,
+    db=config.REDIS_BOOKS_DB,
+    decode_responses=True
+)
+
 
 class BooksStorage(BaseModel):
-    slug_to_book: dict[str, Book] = {}
-
-    def get(self) -> list[Book]:
-        return list(self.slug_to_book.values())
-
-    def get_by_slug(self, slug: str) -> Book | None:
-        return self.slug_to_book.get(slug)
+    def save_book(self, book: Book) -> None:
+        """Сохраняет книгу в Redis хеш"""
+        book_json = book.model_dump_json()
+        redis_books_client.hset(config.REDIS_BOOKS_HASH, book.slug, book_json)
 
     def create(self, book_in: BookCreate) -> Book:
+        """Создает новую книгу"""
         book = Book(**book_in.model_dump())
-        self.slug_to_book[book.slug] = book
+        self.save_book(book)
         return book
 
     def delete_by_slug(self, slug: str) -> None:
-        self.slug_to_book.pop(slug, None)
+        """Удаляет книгу из Redis по slug"""
+        redis_books_client.hdel(config.REDIS_BOOKS_HASH, slug)
 
     def delete(self, book: Book) -> None:
+        """Удаляет книгу из Redis"""
         self.delete_by_slug(slug=book.slug)
 
     def update(self, book: Book, book_in: BookUpdate) -> Book:
-        update_data = book_in.model_dump()
-        for field, value in update_data.items():
+        """Полное обновление книги"""
+        for field, value in book_in.model_dump().items():
             setattr(book, field, value)
-        self.slug_to_book[book.slug] = book
+        self.save_book(book)
         return book
 
-    def partial_update(
-        self,
-        book: Book,
-        book_in: BookPartialUpdate,
-    ) -> Book:
+    def partial_update(self, book: Book, book_in: BookPartialUpdate) -> Book:
+        """Частичное обновление книги"""
         for field, value in book_in.model_dump(exclude_unset=True).items():
             setattr(book, field, value)
-        self.slug_to_book[book.slug] = book
+        self.save_book(book)
         return book
 
 
