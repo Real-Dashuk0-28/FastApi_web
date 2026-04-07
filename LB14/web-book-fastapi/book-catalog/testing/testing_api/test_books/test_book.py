@@ -2,9 +2,9 @@ import unittest
 import sys
 import os
 
-# Добавляем путь к проекту
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+from pydantic import ValidationError
 from schemas.book import Book, BookCreate, BookUpdate, BookPartialUpdate
 
 
@@ -66,7 +66,7 @@ class BookCreateTestCase(unittest.TestCase):
 
     def test_pages_must_be_integer(self):
         """Проверка, что pages не может быть float"""
-        invalid_pages = [100.5, 99.9, 0.1]
+        invalid_pages = [0, -1, -100, 100.5, 99.9]
 
         for pages in invalid_pages:
             with self.subTest(pages=pages):
@@ -78,6 +78,35 @@ class BookCreateTestCase(unittest.TestCase):
                         pages=pages
                     )
 
+    # ============ ТЕСТЫ ДЛЯ ЛАБОРАТОРНОЙ РАБОТЫ №15 ============
+
+    def test_book_slug_too_short(self):
+        """ slug (меньше 3 символов) вызывает ValidationError """
+        with self.assertRaises(ValidationError):
+            BookCreate(
+                title='test',
+                slug='a',
+                description='TEst description',
+                pages=100,
+            )
+    def test_book_slug_too_long(self):
+        """ slug (больше 30 символов) вызывает ValidationError """
+        with self.assertRaises(ValidationError):
+            BookCreate(
+                title='test',
+                slug='a' * 31,
+                description='TEst',
+                pages=100,
+            )
+    def test_book_slug_too_long_with_regex(self):
+        """Проверка длинного slug с проверкой текста ошибки"""
+        with self.assertRaisesRegex(ValidationError, "should have at most 30 characters"):
+            BookCreate(
+                title='test',
+                slug='a' * 31,
+                description='Test',
+                pages=100,
+            )
 
 class BookUpdateTestCase(unittest.TestCase):
     """Тесты для схемы BookUpdate"""
@@ -115,9 +144,9 @@ class BookUpdateTestCase(unittest.TestCase):
             pages=100
         )
 
-        book_update = BookUpdate(title="Updated Title")
+        book_partial = BookPartialUpdate(title="Updated Title")
 
-        for field, value in book_update.model_dump().items():
+        for field, value in book_partial.model_dump(exclude_unset=True).items():
             setattr(original_book, field, value)
 
         self.assertEqual("Updated Title", original_book.title)
