@@ -1,20 +1,12 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
-{% block title %}Главная - Library{% endblock %}
+{% block title %}Главная{% endblock %}
 
 {% block main %}
     <h1>Hello, Book!</h1>
-    <a href="/docs" class="btn btn-primary">Документация API</a>
-    
-    <h3 class="mt-4">Features</h3>
     <ul>
         {% for feature in features %}
             <li>{{ feature }}</li>
         {% endfor %}
     </ul>
-{% endblock %}
-
-{% block footer %}
-    {{ super() }}
-    <p class="small">Библиотека работает с 9:00 до 21:00</p>
 {% endblock %}

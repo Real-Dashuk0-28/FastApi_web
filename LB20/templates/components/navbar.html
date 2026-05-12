@@ -1,0 +1,27 @@
+{% set nav_items = [
+    (url_for('home'), 'Home'),
+    (url_for('about'), 'About')
+] %}
+
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Library</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    {% for url, title in nav_items %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.url.path == url %}active{% endif %}"
+                               href="{{ url }}">
+                                {{ title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
